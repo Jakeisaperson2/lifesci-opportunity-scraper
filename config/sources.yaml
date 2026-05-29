@@ -1,22 +1,27 @@
-# Scraping target definitions
-# Each source has: name, url, type, parser, enabled flag
+# Source site definitions
+# Each entry maps to a row in the source_sites table on first startup.
+# scraper_key must match a key in scrapers/registry.py.
+#
+# To add a new source:
+#   1. Create scrapers/my_source.py (inherit BaseScraper, implement scrape())
+#   2. Register it in scrapers/registry.py: "my_key": MyScraper
+#   3. Add an entry below and restart the app
 
 sources:
-  - name: NIH Grants
-    url: https://grants.nih.gov/funding/searchGuide.htm
-    type: rfp
-    parser: nih
-    enabled: false
-
   - name: ClinicalTrials.gov
-    url: https://clinicaltrials.gov/search?aggFilters=studyType:int
-    type: clinical_trial
-    parser: clinicaltrials
-    enabled: false
+    url: https://clinicaltrials.gov/api/v2/studies
+    scraper_key: clinicaltrials
+    enabled: true
+    scrape_interval_hours: 12
 
-  # Add pharma/biotech partnering pages below
-  # - name: Example Pharma Partnering
-  #   url: https://www.example-pharma.com/partnering
-  #   type: sponsored_research
-  #   parser: generic
-  #   enabled: false
+  - name: Grants.gov
+    url: https://apply07.grants.gov/grantsws/rest/opportunities/search/
+    scraper_key: grants_gov
+    enabled: true
+    scrape_interval_hours: 24
+
+  - name: NIH Guide for Grants and Contracts
+    url: https://grants.nih.gov/feeds/Guide.rss
+    scraper_key: nih_guide
+    enabled: true
+    scrape_interval_hours: 24
