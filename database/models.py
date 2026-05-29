@@ -50,6 +50,28 @@ class Opportunity(Base):
     source = relationship("SourceSite", back_populates="opportunities")
 
 
+class FacultyMember(Base):
+    """A research faculty member scraped from the Michigan Medicine directory."""
+    __tablename__ = "faculty_members"
+
+    id                 = Column(Integer, primary_key=True, index=True)
+    name               = Column(String(255), nullable=False)
+    title              = Column(String(255))
+    department         = Column(String(255), index=True)
+    school             = Column(String(255))
+    research_interests = Column(Text)
+    lab_assets         = Column(Text)
+    project_ideas      = Column(Text)
+    email              = Column(String(255))
+    phone              = Column(String(100))
+    profile_url        = Column(String(1000), unique=True, index=True)
+    url_hash           = Column(String(64), unique=True, index=True)
+    date_discovered    = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    last_updated       = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    is_active          = Column(Boolean, default=True)
+    raw_data           = Column(Text)
+
+
 class ScrapeRun(Base):
     """A record of one execution of a scraper against a source site."""
     __tablename__ = "scrape_runs"

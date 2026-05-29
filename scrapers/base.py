@@ -7,6 +7,22 @@ from loguru import logger
 
 
 @dataclass
+class FacultyData:
+    """Normalized data for a single faculty member, returned by faculty scrapers."""
+    name: str
+    profile_url: str
+    title: str = ""
+    department: str = ""
+    school: str = "Michigan Medicine"
+    research_interests: str = ""   # comma-separated keywords or free text
+    lab_assets: str = ""
+    project_ideas: str = ""
+    email: str = ""
+    phone: str = ""
+    raw_data: str = ""
+
+
+@dataclass
 class OpportunityData:
     """Normalized data for a single opportunity, returned by any scraper."""
     title: str

@@ -32,3 +32,22 @@ def get_db():
 def init_db():
     """Create all tables if they don't exist. Safe to call on every startup."""
     Base.metadata.create_all(bind=engine)
+
+
+def migrate_db():
+    """Add any columns missing from existing tables. Safe to call repeatedly."""
+    from sqlalchemy import text
+    new_columns = {
+        "faculty_members": ["lab_assets TEXT", "project_ideas TEXT"],
+    }
+    with engine.connect() as conn:
+        for table, col_defs in new_columns.items():
+            try:
+                existing = [r[1] for r in conn.execute(text(f"PRAGMA table_info({table})"))]
+            except Exception:
+                continue
+            for col_def in col_defs:
+                col_name = col_def.split()[0]
+                if col_name not in existing:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_def}"))
+        conn.commit()

@@ -3,135 +3,250 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LifeSci Opportunity Discovery</title>
+  <title>FFMI Brain</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .badge { @apply inline-block px-2 py-0.5 rounded text-xs font-medium; }
     .truncate-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    :root { --um-blue: #00274C; --um-maize: #FFCB05; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
 
   <!-- Header -->
-  <header class="bg-blue-900 text-white shadow-md">
+  <header class="text-white shadow-md" style="background-color: #00274C;">
     <div class="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold tracking-tight">LifeSci Opportunity Discovery</h1>
-        <p class="text-blue-200 text-xs mt-0.5">Academic Medical Center BD Intelligence</p>
+        <h1 class="text-xl font-bold tracking-tight">
+          FFMI Brain
+          <span class="ml-2 text-xs font-normal px-2 py-0.5 rounded" style="background-color: #FFCB05; color: #00274C;">Michigan Medicine</span>
+        </h1>
+        <p class="text-xs mt-0.5" style="color: #FFCB05; opacity: 0.85;">Michigan Medicine Business Development Intelligence</p>
       </div>
       <div class="flex items-center gap-3">
-        <span id="scrapeStatus" class="text-xs text-blue-200 hidden"></span>
+        <span id="scrapeStatus" class="text-xs hidden" style="color: #FFCB05;"></span>
         <button id="scrapeBtn"
-          class="bg-green-500 hover:bg-green-400 active:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow transition">
+          class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
+          style="background-color: #FFCB05; color: #00274C;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           Run Scrape
         </button>
       </div>
     </div>
+
+    <!-- Tab bar -->
+    <div class="max-w-screen-xl mx-auto px-6 flex gap-1 pb-0">
+      <button id="tabBtnOpportunities" onclick="showTab('opportunities')"
+        class="tab-btn px-5 py-2 text-sm font-semibold rounded-t-lg transition bg-white"
+        style="color: #00274C;">
+        Opportunities
+      </button>
+      <button id="tabBtnFaculty" onclick="showTab('faculty')"
+        class="tab-btn px-5 py-2 text-sm font-semibold rounded-t-lg transition"
+        style="color: rgba(255,203,5,0.75);">
+        Faculty Directory
+      </button>
+    </div>
   </header>
 
-  <!-- Stats bar -->
-  <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-xs text-gray-400 uppercase tracking-wide">Total Opportunities</p>
-      <p id="statTotal" class="text-3xl font-bold text-blue-700 mt-1">—</p>
-    </div>
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-xs text-gray-400 uppercase tracking-wide">New This Week</p>
-      <p id="statWeek" class="text-3xl font-bold text-green-600 mt-1">—</p>
-    </div>
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-xs text-gray-400 uppercase tracking-wide">Showing</p>
-      <p id="statShowing" class="text-3xl font-bold text-purple-600 mt-1">—</p>
-    </div>
-    <div class="bg-white rounded-xl shadow p-4">
-      <p class="text-xs text-gray-400 uppercase tracking-wide">Last Run</p>
-      <p id="statLastRun" class="text-sm font-semibold text-gray-600 mt-2">—</p>
-    </div>
-  </div>
+  <!-- ================================================================
+       TAB: OPPORTUNITIES
+       ================================================================ -->
+  <div id="tab-opportunities">
 
-  <!-- Filters -->
-  <div class="max-w-screen-xl mx-auto px-6 mt-4">
-    <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center">
-      <input id="searchInput" type="text" placeholder="Search title, org, description..."
-        class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-56 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
-      <select id="typeFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option value="">All Types</option>
-        <option value="grant">Grant</option>
-        <option value="clinical_trial">Clinical Trial</option>
-        <option value="rfp">RFP</option>
-        <option value="collaboration">Collaboration</option>
-        <option value="sponsored_research">Sponsored Research</option>
-        <option value="pilot_study">Pilot Study</option>
-        <option value="data_partnership">Data Partnership</option>
-        <option value="other">Other</option>
-      </select>
-
-      <select id="areaFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option value="">All Therapeutic Areas</option>
-        <option value="oncology">Oncology</option>
-        <option value="cardiology">Cardiology</option>
-        <option value="neurology">Neurology</option>
-        <option value="rare_disease">Rare Disease</option>
-        <option value="ai_digital_health">AI / Digital Health</option>
-        <option value="immunology">Immunology</option>
-        <option value="infectious_disease">Infectious Disease</option>
-        <option value="metabolic_endocrine">Metabolic / Endocrine</option>
-        <option value="respiratory">Respiratory</option>
-        <option value="ophthalmology">Ophthalmology</option>
-      </select>
-
-      <select id="daysFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option value="">All Time</option>
-        <option value="7">Last 7 Days</option>
-        <option value="30">Last 30 Days</option>
-        <option value="90">Last 90 Days</option>
-      </select>
-
-      <button id="clearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear filters</button>
-    </div>
-  </div>
-
-  <!-- Table -->
-  <div class="max-w-screen-xl mx-auto px-6 mt-4 pb-10">
-    <div class="bg-white rounded-xl shadow overflow-hidden">
-
-      <!-- Alert bar for scrape status messages -->
-      <div id="alertBar" class="hidden px-5 py-2.5 text-sm border-b"></div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-100 text-sm">
-          <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-            <tr>
-              <th class="px-4 py-3 text-left w-1/3">Title / Description</th>
-              <th class="px-4 py-3 text-left">Organization</th>
-              <th class="px-4 py-3 text-left">Type</th>
-              <th class="px-4 py-3 text-left">Therapeutic Area</th>
-              <th class="px-4 py-3 text-left">Deadline</th>
-              <th class="px-4 py-3 text-left">Discovered</th>
-              <th class="px-4 py-3 text-left">Source</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody" class="divide-y divide-gray-50">
-            <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Loading...</td></tr>
-          </tbody>
-        </table>
+    <!-- Stats bar -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Total Opportunities</p>
+        <p id="statTotal" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
       </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">New This Week</p>
+        <p id="statWeek" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Showing</p>
+        <p id="statShowing" class="text-3xl font-bold mt-1" style="color: #FFCB05;">—</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Last Run</p>
+        <p id="statLastRun" class="text-sm font-semibold text-gray-600 mt-2">—</p>
+      </div>
+    </div>
 
-      <!-- Pagination -->
-      <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
-        <span id="pageInfo" class="text-xs text-gray-500">—</span>
-        <div class="flex gap-2">
-          <button id="prevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-            &larr; Prev
-          </button>
-          <button id="nextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-            Next &rarr;
-          </button>
+    <!-- Filters -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-4">
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center">
+        <input id="searchInput" type="text" placeholder="Search title, org, description..."
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-56 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <select id="typeFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Types</option>
+          <option value="grant">Grant</option>
+          <option value="clinical_trial">Clinical Trial</option>
+          <option value="rfp">RFP</option>
+          <option value="collaboration">Collaboration</option>
+          <option value="sponsored_research">Sponsored Research</option>
+          <option value="pilot_study">Pilot Study</option>
+          <option value="data_partnership">Data Partnership</option>
+          <option value="other">Other</option>
+        </select>
+
+        <select id="areaFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Therapeutic Areas</option>
+          <option value="oncology">Oncology</option>
+          <option value="cardiology">Cardiology</option>
+          <option value="neurology">Neurology</option>
+          <option value="rare_disease">Rare Disease</option>
+          <option value="ai_digital_health">AI / Digital Health</option>
+          <option value="immunology">Immunology</option>
+          <option value="infectious_disease">Infectious Disease</option>
+          <option value="metabolic_endocrine">Metabolic / Endocrine</option>
+          <option value="respiratory">Respiratory</option>
+          <option value="ophthalmology">Ophthalmology</option>
+        </select>
+
+        <select id="daysFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Time</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+        </select>
+
+        <button id="clearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear filters</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-4 pb-10">
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+
+        <div id="alertBar" class="hidden px-5 py-2.5 text-sm border-b"></div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left w-1/3">Title / Description</th>
+                <th class="px-4 py-3 text-left">Organization</th>
+                <th class="px-4 py-3 text-left">Type</th>
+                <th class="px-4 py-3 text-left">Therapeutic Area</th>
+                <th class="px-4 py-3 text-left">Funding</th>
+                <th class="px-4 py-3 text-left">Deadline</th>
+                <th class="px-4 py-3 text-left">Discovered</th>
+                <th class="px-4 py-3 text-left">Source</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="8" class="px-4 py-12 text-center text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="pageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="prevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+              &larr; Prev
+            </button>
+            <button id="nextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+              Next &rarr;
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /tab-opportunities -->
+
+
+  <!-- ================================================================
+       TAB: FACULTY DIRECTORY
+       ================================================================ -->
+  <div id="tab-faculty" class="hidden">
+
+    <!-- Stats bar -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Total Faculty</p>
+        <p id="facultyStatTotal" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Showing</p>
+        <p id="facultyStatShowing" class="text-3xl font-bold mt-1" style="color: #FFCB05;">—</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wide">Michigan Medicine</p>
+          <p class="text-sm font-semibold text-gray-600 mt-1">researchers.umich.edu</p>
+        </div>
+        <button id="facultyRefreshBtn"
+          class="text-xs font-semibold px-3 py-2 rounded-lg shadow transition"
+          style="background-color: #FFCB05; color: #00274C;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          Refresh Faculty
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-4">
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center">
+        <input id="facultySearchInput" type="text" placeholder="Search name, department, interests, lab assets..."
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-56 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <select id="facultyDeptFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Departments</option>
+        </select>
+
+        <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer whitespace-nowrap">
+          <input id="facultyLabDataFilter" type="checkbox" class="accent-blue-600" />
+          BD Profile Only
+        </label>
+
+        <button id="facultyClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear filters</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="max-w-screen-xl mx-auto px-6 mt-4 pb-10">
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+
+        <div id="facultyAlertBar" class="hidden px-5 py-2.5 text-sm border-b"></div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left">Name</th>
+                <th class="px-4 py-3 text-left">Title</th>
+                <th class="px-4 py-3 text-left">Department</th>
+                <th class="px-4 py-3 text-left">Research Interests</th>
+                <th class="px-4 py-3 text-left">Lab Assets</th>
+                <th class="px-4 py-3 text-left">Contact</th>
+              </tr>
+            </thead>
+            <tbody id="facultyTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="6" class="px-4 py-12 text-center text-gray-400">Click "Refresh Faculty" to load the Michigan Medicine directory.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="facultyPageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="facultyPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+              &larr; Prev
+            </button>
+            <button id="facultyNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+              Next &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-faculty -->
 
   <script src="/static/app.js"></script>
 </body>

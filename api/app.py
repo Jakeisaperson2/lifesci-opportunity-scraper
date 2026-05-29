@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from api.routes.opportunities import router as opportunities_router
 from api.routes.sources import router as sources_router
 from api.routes.scrape import router as scrape_router
+from api.routes.faculty import router as faculty_router
 
 app = FastAPI(
     title="LifeSci Opportunity Discovery",
@@ -24,6 +25,7 @@ templates = Jinja2Templates(directory=str(_base / "frontend" / "templates"))
 app.include_router(opportunities_router, prefix="/api")
 app.include_router(sources_router, prefix="/api")
 app.include_router(scrape_router, prefix="/api")
+app.include_router(faculty_router, prefix="/api")
 
 
 @app.get("/", response_class=HTMLResponse)

@@ -25,3 +25,21 @@ sources:
     scraper_key: nih_guide
     enabled: true
     scrape_interval_hours: 24
+
+  - name: SBIR.gov (Industry R&D Solicitations)
+    url: https://api.sbir.gov/public/api/solicitations
+    scraper_key: sbir_gov
+    enabled: true
+    scrape_interval_hours: 24
+
+  - name: Wellcome Trust
+    url: https://wellcome.org/grant-funding
+    scraper_key: wellcome
+    enabled: true
+    scrape_interval_hours: 48
+
+  - name: Robert Wood Johnson Foundation
+    url: https://www.rwjf.org/en/grants/funding-opportunities.html
+    scraper_key: rwjf
+    enabled: true
+    scrape_interval_hours: 48

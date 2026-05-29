@@ -10,11 +10,17 @@ To add a new source:
 from scrapers.clinicaltrials import ClinicalTrialsScraper
 from scrapers.grants_gov import GrantsGovScraper
 from scrapers.nih_guide import NIHGuideScraper
+from scrapers.sbir_gov import SBIRGovScraper
+from scrapers.wellcome import WellcomeTrustScraper
+from scrapers.rwjf import RWJFScraper
 
 REGISTRY: dict[str, type] = {
     "clinicaltrials": ClinicalTrialsScraper,
     "grants_gov": GrantsGovScraper,
     "nih_guide": NIHGuideScraper,
+    "sbir_gov": SBIRGovScraper,
+    "wellcome": WellcomeTrustScraper,
+    "rwjf": RWJFScraper,
 }
 
 

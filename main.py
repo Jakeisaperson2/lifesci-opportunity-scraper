@@ -15,7 +15,7 @@ from utils.logger import setup_logging
 setup_logging()
 
 from loguru import logger
-from database.session import init_db
+from database.session import init_db, migrate_db
 from database.session import SessionLocal
 from database.models import SourceSite
 
@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
     logger.info("Initializing database...")
     init_db()
+    migrate_db()
     seed_sources()
 
     host = os.getenv("HOST", "127.0.0.1")

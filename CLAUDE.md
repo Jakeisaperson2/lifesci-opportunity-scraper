@@ -1,9 +1,9 @@
-# CLAUDE.md — LifeSci Opportunity Discovery Platform
+# CLAUDE.md — FFMI Brain
 
-Internal BD intelligence tool for an academic medical center. Automatically
-scrapes life sciences and healthcare websites for collaboration opportunities:
-RFPs, clinical trial partnerships, sponsored research, grants, and research
-collaborations.
+Internal BD intelligence tool for Michigan Medicine. Automatically scrapes life
+sciences websites for collaboration opportunities (RFPs, clinical trial partnerships,
+sponsored research, grants) and maintains a Michigan Medicine faculty directory
+cross-referenced with BD-relevant lab assets and project ideas.
 
 ---
 
@@ -16,12 +16,12 @@ collaborations.
 # Start the server
 py main.py
 # → App available at http://127.0.0.1:8000
-# → Click "Run Scrape" in the browser to pull live data
+# → Click "Run Scrape" to pull live opportunity data
+# → Click "Faculty Directory" tab → "Refresh Faculty" to refresh researcher profiles
 ```
 
-**Python note:** Use `py` not `python` — Python 3.9.10 is installed via the
-Windows py launcher. The venv is at `.venv/` and all dependencies are already
-installed.
+**Python note:** Use `py` not `python` — Python 3.9.10 via the Windows py launcher.
+The venv is at `.venv/` and all dependencies are installed.
 
 ---
 
@@ -30,65 +30,77 @@ installed.
 ```
 lifesci-opportunity-scraper/
 │
-├── main.py                   # Entry point: init DB, seed sources, start uvicorn
-├── requirements.txt          # All dependencies (pinned)
-├── .env / .env.example       # Environment variables (DB path, log level, etc.)
-├── config/sources.yaml       # Seed data for source_sites DB table
+├── main.py                     # Entry point: init_db, migrate_db, seed_sources, uvicorn
+├── requirements.txt            # All dependencies (pinned)
+├── .env / .env.example         # DB path, log level, host/port
+├── config/sources.yaml         # Seed data for source_sites DB table
 │
 ├── api/
-│   ├── app.py                # FastAPI app: mounts routes + static files
+│   ├── app.py                  # FastAPI app: mounts all routers + static files
 │   └── routes/
-│       ├── opportunities.py  # GET /api/opportunities (search, filter, paginate)
-│       ├── sources.py        # GET /api/sources, PUT /api/sources/{id}/toggle
-│       └── scrape.py         # POST /api/scrape, GET /api/scrape/runs
+│       ├── opportunities.py    # GET /api/opportunities (search, filter, paginate)
+│       ├── sources.py          # GET /api/sources, PUT /api/sources/{id}/toggle
+│       ├── scrape.py           # POST /api/scrape, GET /api/scrape/runs
+│       └── faculty.py          # GET/POST /api/faculty, /api/faculty/refresh, /api/faculty/enrich
 │
 ├── database/
-│   ├── models.py             # SQLAlchemy ORM: SourceSite, Opportunity, ScrapeRun
-│   └── session.py            # engine, SessionLocal, get_db(), init_db()
+│   ├── models.py               # SQLAlchemy ORM: SourceSite, Opportunity, ScrapeRun, FacultyMember
+│   └── session.py              # engine, SessionLocal, get_db(), init_db(), migrate_db()
 │
 ├── scrapers/
-│   ├── base.py               # BaseScraper ABC + OpportunityData dataclass
-│   ├── registry.py           # Maps scraper_key string → scraper class
-│   ├── clinicaltrials.py     # ClinicalTrials.gov REST API v2
-│   ├── grants_gov.py         # Grants.gov REST API (POST-based search)
-│   └── nih_guide.py          # NIH Guide RSS feed (FOAs: RFA, PAR, PA, RFP)
+│   ├── base.py                 # BaseScraper ABC + OpportunityData + FacultyData dataclasses
+│   ├── registry.py             # Maps scraper_key → class
+│   ├── clinicaltrials.py       # ClinicalTrials.gov REST API v2
+│   ├── grants_gov.py           # Grants.gov REST API (POST-based search)
+│   ├── nih_guide.py            # NIH Guide RSS feed
+│   ├── sbir_gov.py             # SBIR.gov solicitations REST API
+│   ├── wellcome.py             # Wellcome Trust (HTML + Next.js data extraction)
+│   ├── rwjf.py                 # Robert Wood Johnson Foundation (HTML)
+│   ├── um_faculty.py           # Michigan Medicine faculty via NIH Reporter API
+│   └── tableau_faculty.py      # U-M Faculty Database Dashboard (Tableau CSV endpoint)
 │
 ├── services/
-│   ├── classifier.py         # Keyword rules → opportunity_type + therapeutic_area
-│   ├── deduplicator.py       # URL-hash dedup; normalize_title for secondary check
-│   └── scrape_runner.py      # Orchestrates: fetch → classify → dedup → persist
+│   ├── classifier.py           # Keyword rules → opportunity_type + therapeutic_area
+│   ├── deduplicator.py         # URL hash dedup
+│   ├── scrape_runner.py        # Orchestrates: fetch → classify → dedup → persist (opportunities)
+│   └── faculty_runner.py       # run_faculty_scrape() + run_tableau_enrichment()
 │
 ├── frontend/
-│   ├── templates/index.html  # Tailwind dashboard (Jinja2 template)
-│   └── static/app.js         # Vanilla JS: fetch API, filters, pagination, scrape btn
+│   ├── templates/index.html    # Tailwind dashboard — U-M branded (#00274C / #FFCB05)
+│   └── static/app.js           # Vanilla JS: two-tab UI (Opportunities + Faculty Directory)
 │
-├── utils/
-│   └── logger.py             # Loguru: console (colored) + rotating file log
-│
-├── data/                     # SQLite DB lives here (gitignored)
-│   └── opportunities.db      # Created automatically on first run
-│
-└── logs/                     # Log files (gitignored)
-    ├── app.log               # Rotating application log
-    └── server.log            # Uvicorn stdout when launched via PowerShell
+├── utils/logger.py             # Loguru setup (console + rotating file)
+├── data/                       # SQLite DB (gitignored)
+└── logs/                       # Log files (gitignored)
 ```
 
 ---
 
 ## Database Schema
 
-**`source_sites`** — configured scraping targets (seeded from `config/sources.yaml`)
-- `scraper_key` links to a class in `scrapers/registry.py`
-- `enabled` can be toggled via PUT `/api/sources/{id}/toggle`
-- `last_scraped` updated after each successful run
+### `source_sites`
+Configured scraping targets seeded from `config/sources.yaml`.
+- `scraper_key` links to `scrapers/registry.py`
+- `enabled` togglable via PUT `/api/sources/{id}/toggle`
 
-**`opportunities`** — discovered opportunities (deduplicated by `url_hash`)
-- `url_hash` = MD5 of normalized URL — primary dedup key
-- `title_normalized` = lowercased/stripped title — secondary dedup signal
+### `opportunities`
+Deduplicated by `url_hash` (MD5 of normalized URL).
 - `opportunity_type`: grant, clinical_trial, rfp, collaboration, sponsored_research, pilot_study, data_partnership, other
 - `therapeutic_area`: oncology, cardiology, neurology, rare_disease, ai_digital_health, immunology, infectious_disease, metabolic_endocrine, respiratory, ophthalmology
+- `funding_amount` shown as a column in the UI (green text)
 
-**`scrape_runs`** — one record per scraper execution (status: running/success/failed)
+### `faculty_members`
+Michigan Medicine researcher directory. Deduplicated by `url_hash` of profile URL.
+- `research_interests` — MeSH keyword terms from NIH Reporter grants
+- `lab_assets` — lab/clinical capabilities from the U-M Tableau dashboard
+- `project_ideas` — partnership project ideas from the Tableau dashboard
+- `profile_url` — lab website URL (from Tableau) or NIH Reporter profile link
+
+**Migration note:** `migrate_db()` is called on every startup and safely adds
+`lab_assets` / `project_ideas` columns if missing (uses `PRAGMA table_info` + `ALTER TABLE`).
+
+### `scrape_runs`
+One record per scraper execution (status: running/success/failed).
 
 ---
 
@@ -103,67 +115,92 @@ lifesci-opportunity-scraper/
 | GET | `/api/scrape/runs` | Recent scrape run history |
 | GET | `/api/sources` | List all configured sources |
 | PUT | `/api/sources/{id}/toggle` | Enable/disable a source |
+| GET | `/api/faculty` | List faculty with filters: `search`, `department`, `has_lab_data`, `page`, `limit` |
+| GET | `/api/faculty/departments` | Distinct department list for dropdown |
+| GET | `/api/faculty/{id}` | Single faculty member |
+| POST | `/api/faculty/refresh` | Trigger NIH Reporter scrape + Tableau enrichment (sequential) |
+| POST | `/api/faculty/enrich` | Trigger Tableau enrichment only (faster) |
 | GET | `/health` | Health check |
 
 ---
 
-## Active Scrapers
+## Active Opportunity Scrapers
 
 | Scraper | Key | Source | Method |
 |---------|-----|--------|--------|
 | `ClinicalTrialsScraper` | `clinicaltrials` | clinicaltrials.gov/api/v2 | REST API |
 | `GrantsGovScraper` | `grants_gov` | apply07.grants.gov | POST REST API |
 | `NIHGuideScraper` | `nih_guide` | grants.nih.gov/feeds/Guide.rss | RSS/XML |
+| `SBIRGovScraper` | `sbir_gov` | api.sbir.gov/public/api/solicitations | REST API |
+| `WellcomeTrustScraper` | `wellcome` | wellcome.org/grant-funding | HTML/Next.js |
+| `RWJFScraper` | `rwjf` | rwjf.org/grants/funding-opportunities | HTML |
 
 ---
 
-## How to Add a New Scraper
+## Faculty Directory Sources
 
-1. **Create** `scrapers/my_source.py`:
-   ```python
-   from scrapers.base import BaseScraper, OpportunityData
+### 1. NIH Reporter (`scrapers/um_faculty.py`)
+- API: `POST https://api.reporter.nih.gov/v2/projects/search`
+- Queries fiscal years 2024–2025 for `UNIVERSITY OF MICHIGAN AT ANN ARBOR`
+- Filters to medicine-relevant departments (Internal Medicine, Oncology, etc.)
+- Deduplicates by PI `profile_id` across grants; accumulates MeSH terms as `research_interests`
+- Produces ~1,128 faculty records
 
-   class MySourceScraper(BaseScraper):
-       def scrape(self) -> list[OpportunityData]:
-           # fetch, parse, return list of OpportunityData
-           ...
-   ```
+### 2. U-M Tableau Dashboard (`scrapers/tableau_faculty.py`)
+- URL: `https://tableau.dsc.umich.edu/t/UM-Public/views/FacultyDatabaseDashboard/Page2.csv?:showVizHome=no&:embed=y`
+- No auth needed — guest access CSV endpoint works directly with `requests`
+- 87–88 rows; columns: `Faculty Info` (name/dept/title), `Assets, Project Ideas, & Keywords` (sectioned text), `Lab Website`
+- Parsed into `lab_assets` (LAB ASSETS + CLINICAL ASSETS sections) and `project_ideas`
 
-2. **Register** in `scrapers/registry.py`:
-   ```python
-   from scrapers.my_source import MySourceScraper
-   REGISTRY = {
-       ...
-       "my_key": MySourceScraper,
-   }
-   ```
-
-3. **Add** to `config/sources.yaml`:
-   ```yaml
-   - name: My Source Name
-     url: https://example.com/opportunities
-     scraper_key: my_key
-     enabled: true
-     scrape_interval_hours: 24
-   ```
-
-4. Restart the app — the new source is seeded automatically on startup.
+### Enrichment / Name Matching (`services/faculty_runner.py`)
+- `run_tableau_enrichment()` matches Tableau rows to existing NIH records by name
+- Match strategy: exact normalized → token-subset (handles "Adam Helms" ↔ "Adam S Helms") → `difflib` similarity ≥ 0.85
+- Matched: updates `lab_assets`, `project_ideas`, `profile_url` on existing record
+- Unmatched: inserted as new record (clinical faculty not in NIH Reporter)
+- Empty `profile_url` stored as `None` (not `""`) to avoid UNIQUE constraint collisions
 
 ---
 
-## Known Issues Fixed This Session
+## Frontend
 
-- **Python 3.9 type hint incompatibility**: `str | None` union syntax requires
-  Python 3.10+. Fixed by replacing with `Optional[str]` from `typing` in
-  `scrapers/base.py`, `scrapers/nih_guide.py`, and `services/scrape_runner.py`.
+Single-page app with two tabs: **Opportunities** and **Faculty Directory**.
 
-- **greenlet build failure on Python 3.9 Windows**: `greenlet` 3.x dropped
-  pre-built Windows wheels for Python 3.9. Fixed by pinning `greenlet==2.0.2`
-  in `requirements.txt`.
+**Branding:** U-M Blue `#00274C` header, Maize `#FFCB05` accents (buttons, subtitle, "Showing" stat).
+
+**Opportunities tab:**
+- Filters: text search, type, therapeutic area, time window
+- Columns: Title/Description, Organization, Type (badge), Therapeutic Area (badge), Funding (green), Deadline (color-coded), Discovered, Source
+- Funding column (`funding_amount`) shown in green
+
+**Faculty Directory tab:**
+- Lazy-loads on first tab visit
+- Filters: text search (name/dept/interests/lab assets), department dropdown, "BD Profile Only" checkbox (`has_lab_data=true`)
+- Columns: Name (linked), Title, Department, Research Interests (truncated), Lab Assets (truncated + hover tooltip), Contact
+- Rows with Tableau BD data have a green dot indicator and subtle blue tint
+- "Refresh Faculty" runs NIH Reporter scrape then Tableau enrichment sequentially
 
 ---
 
-## Environment Variables (.env)
+## How to Add a New Opportunity Scraper
+
+1. Create `scrapers/my_source.py` inheriting `BaseScraper`, implement `scrape() -> list[OpportunityData]`
+2. Add `"my_key": MySourceScraper` to `scrapers/registry.py`
+3. Add entry to `config/sources.yaml` with `scraper_key: my_key`
+4. Restart app — sources are seeded from YAML on startup
+
+---
+
+## Known Issues Fixed
+
+- **Python 3.9 type hints**: `str | None` → `Optional[str]` in base.py, nih_guide.py, scrape_runner.py
+- **greenlet build failure on Python 3.9 Windows**: pinned `greenlet==2.0.2`
+- **Tableau guest CSV**: direct `.csv?:embed=y` endpoint works; `tableauscraper` library not needed
+- **UNIQUE constraint on empty profile_url**: Tableau-only faculty with no lab website stored with `profile_url=None`
+- **migrate_db()**: needed because `create_all()` won't add columns to existing tables
+
+---
+
+## Environment Variables (`.env`)
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
@@ -177,19 +214,11 @@ lifesci-opportunity-scraper/
 
 ## How to Start the Server (Windows)
 
-**Simple (recommended):**
 ```bash
 py main.py
 ```
 
-**Detached background process via PowerShell** (if running from Claude Code):
-```powershell
-Start-Process -FilePath ".venv\Scripts\python.exe" -ArgumentList "main.py" `
-  -RedirectStandardOutput "logs\server.log" `
-  -RedirectStandardError "logs\server_err.log" -NoNewWindow
-```
-
-**Stop the server:**
+**Stop:**
 ```powershell
 Get-Process python | Stop-Process -Force
 ```
@@ -198,7 +227,6 @@ Get-Process python | Stop-Process -Force
 
 ## Backlog / Next Steps
 
-- [ ] Add more scrapers: BARDA, NSF, SBIR.gov, pharma company partnership pages
 - [ ] Scheduled auto-scraping (APScheduler or Windows Task Scheduler)
 - [ ] Email/Slack alerts for new opportunities matching saved filters
 - [ ] AI summarization of opportunity descriptions (Claude API)
@@ -207,6 +235,9 @@ Get-Process python | Stop-Process -Force
 - [ ] Opportunity status tracking (interested / contacted / submitted / declined)
 - [ ] Full-text search with ranking (SQLite FTS5)
 - [ ] Playwright support for JS-rendered pages (pharma partner portals)
+- [ ] Fix/update ClinicalTrials.gov and NIH Guide scrapers (currently returning 400/404 errors — API changes)
+- [ ] Faculty: add cross-reference view linking opportunities to matching faculty by keyword overlap
+- [ ] Faculty: scheduled auto-refresh (NIH Reporter + Tableau) via APScheduler
 
 ---
 
