@@ -1,0 +1,22 @@
+# Scraping target definitions
+# Each source has: name, url, type, parser, enabled flag
+
+sources:
+  - name: NIH Grants
+    url: https://grants.nih.gov/funding/searchGuide.htm
+    type: rfp
+    parser: nih
+    enabled: false
+
+  - name: ClinicalTrials.gov
+    url: https://clinicaltrials.gov/search?aggFilters=studyType:int
+    type: clinical_trial
+    parser: clinicaltrials
+    enabled: false
+
+  # Add pharma/biotech partnering pages below
+  # - name: Example Pharma Partnering
+  #   url: https://www.example-pharma.com/partnering
+  #   type: sponsored_research
+  #   parser: generic
+  #   enabled: false
