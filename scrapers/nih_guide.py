@@ -14,6 +14,7 @@ import json
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from email.utils import parsedate_to_datetime
+from typing import Optional
 from loguru import logger
 from scrapers.base import BaseScraper, OpportunityData
 
@@ -83,7 +84,7 @@ class NIHGuideScraper(BaseScraper):
         logger.info(f"NIH Guide: found {len(opportunities)} opportunities")
         return opportunities
 
-    def _classify_foa_type(self, title: str) -> str | None:
+    def _classify_foa_type(self, title: str) -> Optional[str]:
         upper = title.upper()
         for prefix, opp_type in self.FOA_TYPE_MAP.items():
             if prefix in upper:
@@ -91,7 +92,7 @@ class NIHGuideScraper(BaseScraper):
         return "grant"  # default for unrecognized NIH announcements
 
     @staticmethod
-    def _parse_rss_date(value: str | None) -> datetime | None:
+    def _parse_rss_date(value: Optional[str]) -> Optional[datetime]:
         if not value:
             return None
         try:

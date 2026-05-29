@@ -12,6 +12,7 @@ Flow for each enabled source:
   8. Update SourceSite.last_scraped
 """
 from datetime import datetime, timezone
+from typing import Optional
 from loguru import logger
 from sqlalchemy.orm import Session
 
@@ -23,7 +24,7 @@ from services.classifier import classify
 from services.deduplicator import is_duplicate, prepare_hashes
 
 
-def run_all(source_ids: list[int] | None = None):
+def run_all(source_ids: Optional[list] = None):
     """
     Run scrapers for all enabled sources, or a specific subset by ID.
     Called from the API endpoint (in a background thread) or CLI.

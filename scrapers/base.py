@@ -61,7 +61,7 @@ class BaseScraper(ABC):
         return resp
 
     @staticmethod
-    def parse_date(value: str | None, fmt: str = "%m/%d/%Y") -> Optional[datetime]:
+    def parse_date(value: Optional[str], fmt: str = "%m/%d/%Y") -> Optional[datetime]:
         if not value:
             return None
         try:
