@@ -73,7 +73,7 @@ lifesci-opportunity-scraper/
 │
 ├── frontend/
 │   ├── templates/index.html    # Tailwind dashboard — U-M branded (#00274C / #FFCB05)
-│   └── static/app.js           # Vanilla JS: two-tab UI (Opportunities + Faculty Directory)
+│   └── static/app.js           # Vanilla JS: 7-tab SPA with lazy loading + modal CRUD system
 │
 ├── utils/logger.py             # Loguru setup (console + rotating file)
 ├── data/                       # SQLite DB (gitignored)
@@ -121,8 +121,10 @@ Michigan Medicine researcher directory. Deduplicated by `url_hash` of profile UR
 - `project_ideas` — partnership project ideas from the Tableau dashboard
 - `profile_url` — lab website URL (from Tableau) or NIH Reporter profile link
 
-**Migration note:** `migrate_db()` is called on every startup and safely adds
-`lab_assets` / `project_ideas` columns if missing (uses `PRAGMA table_info` + `ALTER TABLE`).
+**Migration note:** `migrate_db()` is called on every startup and safely adds missing columns
+(`lab_assets`, `project_ideas` on faculty_members; `crm_status`, `organization_id` on opportunities)
+using `PRAGMA table_info` + `ALTER TABLE`. New tables (organizations, contacts, activities, tasks)
+are created by `create_all()` on first startup — zero manual migration needed.
 
 ### `scrape_runs`
 One record per scraper execution (status: running/success/failed).
@@ -200,21 +202,64 @@ One record per scraper execution (status: running/success/failed).
 
 ## Frontend
 
-Single-page app with two tabs: **Opportunities** and **Faculty Directory**.
+Single-page app with **7 tabs**, all lazy-loaded on first visit. Shared modal system for CRUD.
 
-**Branding:** U-M Blue `#00274C` header, Maize `#FFCB05` accents (buttons, subtitle, "Showing" stat).
+**Branding:** U-M Blue `#00274C` header, Maize `#FFCB05` accents.
 
-**Opportunities tab:**
-- Filters: text search, type, therapeutic area, time window
-- Columns: Title/Description, Organization, Type (badge), Therapeutic Area (badge), Funding (green), Deadline (color-coded), Discovered, Source
-- Funding column (`funding_amount`) shown in green
+**Tab: Opportunities**
+- Filters: text search, type, therapeutic area, CRM status, time window
+- Inline CRM status `<select>` on every row — changes stage immediately via PATCH
+- Columns: Title/Description, Organization, Type (badge), Funding (green), Deadline (color-coded), CRM Status, Discovered
 
-**Faculty Directory tab:**
+**Tab: Pipeline**
+- Stage cards grid (10 stages) — click any card to filter the table below to that stage
+- Stage keys: new → reviewing → interested → outreach_started → proposal_in_progress → submitted → negotiating → awarded → lost → archived
+- Inline status `<select>` on each row so you can advance without leaving the tab
+
+**Tab: Organizations**
+- CRUD via modal — name, type, website, relationship status, next follow-up date, notes
+- Shows contact count and linked opportunity count per org
+
+**Tab: Contacts**
+- CRUD via modal — name, title, org dropdown (pulls live from API), email, phone, LinkedIn, notes
+
+**Tab: Activities**
+- Log interactions: email, meeting, phone_call, proposal_submission, follow_up, internal_review, negotiation
+- Modal links activity to opportunity + org + contact (all optional)
+- Displayed chronologically, newest first
+
+**Tab: Tasks**
+- Checkbox completion (PATCH status inline), priority badges, overdue highlighting (red)
+- CRUD modal with due date, priority, assigned-to, linked opportunity
+
+**Tab: Faculty Directory**
 - Lazy-loads on first tab visit
 - Filters: text search (name/dept/interests/lab assets), department dropdown, "BD Profile Only" checkbox (`has_lab_data=true`)
 - Columns: Name (linked), Title, Department, Research Interests (truncated), Lab Assets (truncated + hover tooltip), Contact
 - Rows with Tableau BD data have a green dot indicator and subtle blue tint
 - "Refresh Faculty" runs NIH Reporter scrape then Tableau enrichment sequentially
+
+**Modal system (`app.js`):**
+- Single `#modalOverlay` div reused across all CRM entities
+- `openOrgModal(org?)`, `openContactModal(contact?)`, `openActivityModal()`, `openTaskModal(task?)` populate `#modalBody` and set `_modalSave` callback
+- `#modalSaveBtn` calls `_modalSave()` which POSTs or PUTs to the API then reloads the tab
+
+**JS architecture:**
+- Each tab has its own `state` object (page, filters) and `load*()` / `render*Table()` pair
+- `_lazyLoaded` map prevents double-loads; reset to `false` after any CRUD to force a refresh
+- `ALL_TABS` array drives `showTab()` — to add a new tab, add its key here and wire a `load*` call
+
+---
+
+## How to Add a New CRM Entity
+
+1. Add a SQLAlchemy model to `database/models.py` with appropriate FK relationships
+2. If adding columns to an **existing** table, add them to the `new_columns` dict in `database/session.py:migrate_db()`
+3. Create `api/routes/crm/my_entity.py` — copy `tasks.py` as a template (Pydantic `In` schema, `_ser()` serializer, CRUD routes)
+4. Register the router in `api/app.py`: `from api.routes.crm.my_entity import router as my_router` then `app.include_router(my_router, prefix="/api")`
+5. Add a tab to `frontend/templates/index.html` and a corresponding `tabBtn` button in the nav
+6. Add the tab key to `ALL_TABS` in `frontend/static/app.js`, add a lazy-load call in `showTab()`, and implement `load*()` / `render*Table()` / `open*Modal()` following the existing patterns
+7. Restart app — `init_db()` creates the new table automatically
 
 ---
 
@@ -264,16 +309,23 @@ Get-Process python | Stop-Process -Force
 
 ## Backlog / Next Steps
 
-- [ ] Scheduled auto-scraping (APScheduler or Windows Task Scheduler)
+### Phase 2 CRM (not yet built)
+- [ ] **Project tracking** — when opportunity moves to "awarded", auto-create a Project record (sponsor, PI, start/end dates, award amount, milestones, deliverables)
+- [ ] **Timeline / deadlines view** — unified calendar of proposal deadlines, reporting deadlines, IRB milestones, contract negotiation dates
+- [ ] **Reporting tab** — opportunities by status, by sponsor, by funding amount; conversion funnel; active negotiations
+
+### Scraper improvements
+- [ ] Fix ClinicalTrials.gov scraper (currently 400 — API v2 field list format changed)
+- [ ] Fix NIH Guide RSS scraper (currently 404 — URL moved)
+- [ ] Playwright support for JS-rendered pages (pharma partner portals)
+- [ ] Scheduled auto-scraping via APScheduler
+
+### Platform features
 - [ ] Email/Slack alerts for new opportunities matching saved filters
 - [ ] AI summarization of opportunity descriptions (Claude API)
 - [ ] CSV/Excel export from the dashboard
-- [ ] Saved searches / watchlists per user
-- [ ] Opportunity status tracking (interested / contacted / submitted / declined)
 - [ ] Full-text search with ranking (SQLite FTS5)
-- [ ] Playwright support for JS-rendered pages (pharma partner portals)
-- [ ] Fix/update ClinicalTrials.gov and NIH Guide scrapers (currently returning 400/404 errors — API changes)
-- [ ] Faculty: add cross-reference view linking opportunities to matching faculty by keyword overlap
+- [ ] Faculty: cross-reference view linking opportunities to matching faculty by keyword overlap
 - [ ] Faculty: scheduled auto-refresh (NIH Reporter + Tableau) via APScheduler
 
 ---
