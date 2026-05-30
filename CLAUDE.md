@@ -1,9 +1,9 @@
 # CLAUDE.md — FFMI Brain
 
-Internal BD intelligence tool for Michigan Medicine. Automatically scrapes life
+Internal BD intelligence and CRM platform for Michigan Medicine. Automatically scrapes life
 sciences websites for collaboration opportunities (RFPs, clinical trial partnerships,
-sponsored research, grants) and maintains a Michigan Medicine faculty directory
-cross-referenced with BD-relevant lab assets and project ideas.
+sponsored research, grants), maintains a Michigan Medicine faculty directory, and provides
+a full CRM pipeline for tracking organizations, contacts, activities, and business development tasks.
 
 ---
 
@@ -38,13 +38,19 @@ lifesci-opportunity-scraper/
 ├── api/
 │   ├── app.py                  # FastAPI app: mounts all routers + static files
 │   └── routes/
-│       ├── opportunities.py    # GET /api/opportunities (search, filter, paginate)
+│       ├── opportunities.py    # GET/PATCH /api/opportunities (search, filter, crm_status, paginate)
 │       ├── sources.py          # GET /api/sources, PUT /api/sources/{id}/toggle
 │       ├── scrape.py           # POST /api/scrape, GET /api/scrape/runs
-│       └── faculty.py          # GET/POST /api/faculty, /api/faculty/refresh, /api/faculty/enrich
+│       ├── faculty.py          # GET/POST /api/faculty, /api/faculty/refresh, /api/faculty/enrich
+│       └── crm/
+│           ├── organizations.py  # CRUD /api/crm/organizations
+│           ├── contacts.py       # CRUD /api/crm/contacts
+│           ├── activities.py     # CRUD /api/crm/activities
+│           ├── tasks.py          # CRUD /api/crm/tasks + PATCH status
+│           └── pipeline.py       # GET /api/crm/pipeline (stage counts)
 │
 ├── database/
-│   ├── models.py               # SQLAlchemy ORM: SourceSite, Opportunity, ScrapeRun, FacultyMember
+│   ├── models.py               # ORM: SourceSite, Opportunity, Organization, Contact, Activity, Task, FacultyMember, ScrapeRun
 │   └── session.py              # engine, SessionLocal, get_db(), init_db(), migrate_db()
 │
 ├── scrapers/
@@ -87,7 +93,26 @@ Configured scraping targets seeded from `config/sources.yaml`.
 Deduplicated by `url_hash` (MD5 of normalized URL).
 - `opportunity_type`: grant, clinical_trial, rfp, collaboration, sponsored_research, pilot_study, data_partnership, other
 - `therapeutic_area`: oncology, cardiology, neurology, rare_disease, ai_digital_health, immunology, infectious_disease, metabolic_endocrine, respiratory, ophthalmology
-- `funding_amount` shown as a column in the UI (green text)
+- `crm_status`: new, reviewing, interested, outreach_started, proposal_in_progress, submitted, negotiating, awarded, lost, archived
+- `organization_id` FK → organizations (nullable, for linking CRM org records)
+
+### `organizations`
+CRM organization records (pharma/biotech/academic partners).
+- `relationship_status`: prospect, active, partner, inactive
+- Linked to contacts, opportunities, activities
+
+### `contacts`
+Individual contacts at organizations.
+- FK → organizations
+
+### `activities`
+Activity log entries (email, meeting, phone_call, proposal_submission, follow_up, internal_review, negotiation).
+- FK → opportunities, organizations, contacts (all nullable)
+
+### `tasks`
+BD tasks with due dates and priorities (low/medium/high/urgent).
+- `status`: open, in_progress, complete
+- FK → opportunities (nullable)
 
 ### `faculty_members`
 Michigan Medicine researcher directory. Deduplicated by `url_hash` of profile URL.
@@ -109,17 +134,29 @@ One record per scraper execution (status: running/success/failed).
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET | `/` | Dashboard HTML |
-| GET | `/api/opportunities` | List with filters: `search`, `opportunity_type`, `therapeutic_area`, `days`, `page`, `limit` |
+| GET | `/api/opportunities` | List with filters: `search`, `opportunity_type`, `therapeutic_area`, `crm_status`, `days`, `page`, `limit` |
 | GET | `/api/opportunities/{id}` | Single opportunity |
-| POST | `/api/scrape` | Trigger background scrape (optional `?source_ids=1,2`) |
+| PATCH | `/api/opportunities/{id}/crm_status?status=…` | Update CRM pipeline status |
+| PATCH | `/api/opportunities/{id}/organization?organization_id=…` | Link to org record |
+| POST | `/api/scrape` | Trigger background scrape |
 | GET | `/api/scrape/runs` | Recent scrape run history |
 | GET | `/api/sources` | List all configured sources |
 | PUT | `/api/sources/{id}/toggle` | Enable/disable a source |
-| GET | `/api/faculty` | List faculty with filters: `search`, `department`, `has_lab_data`, `page`, `limit` |
-| GET | `/api/faculty/departments` | Distinct department list for dropdown |
+| GET | `/api/faculty` | List faculty with filters |
+| GET | `/api/faculty/departments` | Distinct department list |
 | GET | `/api/faculty/{id}` | Single faculty member |
-| POST | `/api/faculty/refresh` | Trigger NIH Reporter scrape + Tableau enrichment (sequential) |
-| POST | `/api/faculty/enrich` | Trigger Tableau enrichment only (faster) |
+| POST | `/api/faculty/refresh` | NIH Reporter scrape + Tableau enrichment |
+| POST | `/api/faculty/enrich` | Tableau enrichment only |
+| **GET** | **`/api/crm/pipeline`** | **Pipeline stage counts** |
+| **GET/POST** | **`/api/crm/organizations`** | **List / create organizations** |
+| **GET/PUT/DELETE** | **`/api/crm/organizations/{id}`** | **Get / update / delete org** |
+| **GET/POST** | **`/api/crm/contacts`** | **List / create contacts** |
+| **GET/PUT/DELETE** | **`/api/crm/contacts/{id}`** | **Get / update / delete contact** |
+| **GET/POST** | **`/api/crm/activities`** | **List / log activities** |
+| **GET/PUT/DELETE** | **`/api/crm/activities/{id}`** | **Get / update / delete activity** |
+| **GET/POST** | **`/api/crm/tasks`** | **List / create tasks** |
+| **GET/PUT/DELETE** | **`/api/crm/tasks/{id}`** | **Get / update / delete task** |
+| **PATCH** | **`/api/crm/tasks/{id}/status?status=…`** | **Toggle task status** |
 | GET | `/health` | Health check |
 
 ---

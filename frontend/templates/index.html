@@ -35,26 +35,34 @@
     </div>
 
     <!-- Tab bar -->
-    <div class="max-w-screen-xl mx-auto px-6 flex gap-1 pb-0">
+    <div class="max-w-screen-xl mx-auto px-6 flex gap-1 pb-0 overflow-x-auto">
       <button id="tabBtnOpportunities" onclick="showTab('opportunities')"
-        class="tab-btn px-5 py-2 text-sm font-semibold rounded-t-lg transition bg-white"
-        style="color: #00274C;">
-        Opportunities
-      </button>
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition bg-white whitespace-nowrap"
+        style="color: #00274C;">Opportunities</button>
+      <button id="tabBtnPipeline" onclick="showTab('pipeline')"
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Pipeline</button>
+      <button id="tabBtnOrganizations" onclick="showTab('organizations')"
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Organizations</button>
+      <button id="tabBtnContacts" onclick="showTab('contacts')"
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Contacts</button>
+      <button id="tabBtnActivities" onclick="showTab('activities')"
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Activities</button>
+      <button id="tabBtnTasks" onclick="showTab('tasks')"
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Tasks</button>
       <button id="tabBtnFaculty" onclick="showTab('faculty')"
-        class="tab-btn px-5 py-2 text-sm font-semibold rounded-t-lg transition"
-        style="color: rgba(255,203,5,0.75);">
-        Faculty Directory
-      </button>
+        class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
+        style="color: rgba(255,203,5,0.75);">Faculty Directory</button>
     </div>
   </header>
 
-  <!-- ================================================================
-       TAB: OPPORTUNITIES
-       ================================================================ -->
-  <div id="tab-opportunities">
 
-    <!-- Stats bar -->
+  <!-- ================================================================ OPPORTUNITIES ================================================================ -->
+  <div id="tab-opportunities">
     <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Total Opportunities</p>
@@ -74,12 +82,10 @@
       </div>
     </div>
 
-    <!-- Filters -->
     <div class="max-w-screen-xl mx-auto px-6 mt-4">
       <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center">
         <input id="searchInput" type="text" placeholder="Search title, org, description..."
-          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-56 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-48 focus:outline-none focus:ring-2 focus:ring-blue-400" />
         <select id="typeFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">All Types</option>
           <option value="grant">Grant</option>
@@ -91,7 +97,6 @@
           <option value="data_partnership">Data Partnership</option>
           <option value="other">Other</option>
         </select>
-
         <select id="areaFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">All Therapeutic Areas</option>
           <option value="oncology">Oncology</option>
@@ -105,24 +110,32 @@
           <option value="respiratory">Respiratory</option>
           <option value="ophthalmology">Ophthalmology</option>
         </select>
-
+        <select id="crmStatusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="reviewing">Reviewing</option>
+          <option value="interested">Interested</option>
+          <option value="outreach_started">Outreach Started</option>
+          <option value="proposal_in_progress">Proposal In Progress</option>
+          <option value="submitted">Submitted</option>
+          <option value="negotiating">Negotiating</option>
+          <option value="awarded">Awarded</option>
+          <option value="lost">Lost</option>
+          <option value="archived">Archived</option>
+        </select>
         <select id="daysFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">All Time</option>
           <option value="7">Last 7 Days</option>
           <option value="30">Last 30 Days</option>
           <option value="90">Last 90 Days</option>
         </select>
-
         <button id="clearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear filters</button>
       </div>
     </div>
 
-    <!-- Table -->
     <div class="max-w-screen-xl mx-auto px-6 mt-4 pb-10">
       <div class="bg-white rounded-xl shadow overflow-hidden">
-
         <div id="alertBar" class="hidden px-5 py-2.5 text-sm border-b"></div>
-
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-100 text-sm">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
@@ -130,42 +143,314 @@
                 <th class="px-4 py-3 text-left w-1/3">Title / Description</th>
                 <th class="px-4 py-3 text-left">Organization</th>
                 <th class="px-4 py-3 text-left">Type</th>
-                <th class="px-4 py-3 text-left">Therapeutic Area</th>
                 <th class="px-4 py-3 text-left">Funding</th>
                 <th class="px-4 py-3 text-left">Deadline</th>
+                <th class="px-4 py-3 text-left">CRM Status</th>
                 <th class="px-4 py-3 text-left">Discovered</th>
-                <th class="px-4 py-3 text-left">Source</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-gray-50">
-              <tr><td colspan="8" class="px-4 py-12 text-center text-gray-400">Loading...</td></tr>
+              <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Loading...</td></tr>
             </tbody>
           </table>
         </div>
-
         <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
           <span id="pageInfo" class="text-xs text-gray-500">—</span>
           <div class="flex gap-2">
-            <button id="prevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-              &larr; Prev
-            </button>
-            <button id="nextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-              Next &rarr;
-            </button>
+            <button id="prevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="nextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
           </div>
         </div>
       </div>
     </div>
-
   </div><!-- /tab-opportunities -->
 
 
-  <!-- ================================================================
-       TAB: FACULTY DIRECTORY
-       ================================================================ -->
-  <div id="tab-faculty" class="hidden">
+  <!-- ================================================================ PIPELINE ================================================================ -->
+  <div id="tab-pipeline" class="hidden">
+    <div class="max-w-screen-xl mx-auto px-6 mt-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold" style="color: #00274C;">BD Pipeline</h2>
+        <p class="text-xs text-gray-400">Click a stage to filter the table below</p>
+      </div>
 
-    <!-- Stats bar -->
+      <!-- Stage cards -->
+      <div id="pipelineStages" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+        <div class="bg-white rounded-xl shadow p-3 text-center text-gray-300">Loading...</div>
+      </div>
+
+      <!-- Filtered opportunities table for selected stage -->
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="px-5 py-3 border-b flex items-center justify-between">
+          <span id="pipelineTableTitle" class="text-sm font-semibold" style="color: #00274C;">All Active Opportunities</span>
+          <button id="pipelineClearFilter" class="text-xs text-gray-400 hover:text-gray-600 underline hidden">Clear stage filter</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left w-2/5">Title</th>
+                <th class="px-4 py-3 text-left">Organization</th>
+                <th class="px-4 py-3 text-left">Type</th>
+                <th class="px-4 py-3 text-left">Funding</th>
+                <th class="px-4 py-3 text-left">Deadline</th>
+                <th class="px-4 py-3 text-left">Stage</th>
+              </tr>
+            </thead>
+            <tbody id="pipelineTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="6" class="px-4 py-12 text-center text-gray-300">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="pipelinePageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="pipelinePrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="pipelineNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-pipeline -->
+
+
+  <!-- ================================================================ ORGANIZATIONS ================================================================ -->
+  <div id="tab-organizations" class="hidden">
+    <div class="max-w-screen-xl mx-auto px-6 mt-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold" style="color: #00274C;">Organizations</h2>
+          <p id="orgStatTotal" class="text-xs text-gray-400 mt-0.5">— organizations</p>
+        </div>
+        <button onclick="openOrgModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
+          style="background-color: #00274C; color: white;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          + New Organization
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center mb-4">
+        <input id="orgSearch" type="text" placeholder="Search organizations..."
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-48 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <select id="orgStatusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Relationship Statuses</option>
+          <option value="prospect">Prospect</option>
+          <option value="active">Active</option>
+          <option value="partner">Partner</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <button id="orgClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear</button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left">Name</th>
+                <th class="px-4 py-3 text-left">Type</th>
+                <th class="px-4 py-3 text-left">Relationship</th>
+                <th class="px-4 py-3 text-left">Website</th>
+                <th class="px-4 py-3 text-left">Contacts</th>
+                <th class="px-4 py-3 text-left">Opportunities</th>
+                <th class="px-4 py-3 text-left">Next Follow-up</th>
+                <th class="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orgTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="8" class="px-4 py-12 text-center text-gray-400">No organizations yet. Add one to start tracking.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="orgPageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="orgPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="orgNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-organizations -->
+
+
+  <!-- ================================================================ CONTACTS ================================================================ -->
+  <div id="tab-contacts" class="hidden">
+    <div class="max-w-screen-xl mx-auto px-6 mt-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold" style="color: #00274C;">Contacts</h2>
+          <p id="contactStatTotal" class="text-xs text-gray-400 mt-0.5">— contacts</p>
+        </div>
+        <button onclick="openContactModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
+          style="background-color: #00274C; color: white;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          + New Contact
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center mb-4">
+        <input id="contactSearch" type="text" placeholder="Search contacts by name or email..."
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-48 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button id="contactClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear</button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left">Name</th>
+                <th class="px-4 py-3 text-left">Title</th>
+                <th class="px-4 py-3 text-left">Organization</th>
+                <th class="px-4 py-3 text-left">Email</th>
+                <th class="px-4 py-3 text-left">Phone</th>
+                <th class="px-4 py-3 text-left">LinkedIn</th>
+                <th class="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="contactTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">No contacts yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="contactPageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="contactPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="contactNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-contacts -->
+
+
+  <!-- ================================================================ ACTIVITIES ================================================================ -->
+  <div id="tab-activities" class="hidden">
+    <div class="max-w-screen-xl mx-auto px-6 mt-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold" style="color: #00274C;">Activity Log</h2>
+          <p id="activityStatTotal" class="text-xs text-gray-400 mt-0.5">— activities</p>
+        </div>
+        <button onclick="openActivityModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
+          style="background-color: #00274C; color: white;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          + Log Activity
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center mb-4">
+        <select id="activityTypeFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Activity Types</option>
+          <option value="email">Email</option>
+          <option value="meeting">Meeting</option>
+          <option value="phone_call">Phone Call</option>
+          <option value="proposal_submission">Proposal Submission</option>
+          <option value="follow_up">Follow-Up</option>
+          <option value="internal_review">Internal Review</option>
+          <option value="negotiation">Negotiation</option>
+        </select>
+        <button id="activityClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear</button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left">Date</th>
+                <th class="px-4 py-3 text-left">Type</th>
+                <th class="px-4 py-3 text-left w-1/3">Description</th>
+                <th class="px-4 py-3 text-left">Opportunity</th>
+                <th class="px-4 py-3 text-left">Organization</th>
+                <th class="px-4 py-3 text-left">Contact</th>
+                <th class="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="activityTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">No activities logged yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="activityPageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="activityPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="activityNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-activities -->
+
+
+  <!-- ================================================================ TASKS ================================================================ -->
+  <div id="tab-tasks" class="hidden">
+    <div class="max-w-screen-xl mx-auto px-6 mt-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold" style="color: #00274C;">Tasks</h2>
+          <p id="taskStatTotal" class="text-xs text-gray-400 mt-0.5">— tasks</p>
+        </div>
+        <button onclick="openTaskModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
+          style="background-color: #00274C; color: white;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          + New Task
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center mb-4">
+        <select id="taskStatusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="open">Open Tasks</option>
+          <option value="">All Tasks</option>
+          <option value="in_progress">In Progress</option>
+          <option value="complete">Completed</option>
+        </select>
+        <select id="taskPriorityFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">All Priorities</option>
+          <option value="urgent">Urgent</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <button id="taskClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear</button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-100 text-sm">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th class="px-4 py-3 text-left">Done</th>
+                <th class="px-4 py-3 text-left w-1/3">Task</th>
+                <th class="px-4 py-3 text-left">Due Date</th>
+                <th class="px-4 py-3 text-left">Priority</th>
+                <th class="px-4 py-3 text-left">Assigned To</th>
+                <th class="px-4 py-3 text-left">Opportunity</th>
+                <th class="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody" class="divide-y divide-gray-50">
+              <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">No tasks yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
+          <span id="taskPageInfo" class="text-xs text-gray-500">—</span>
+          <div class="flex gap-2">
+            <button id="taskPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="taskNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-tasks -->
+
+
+  <!-- ================================================================ FACULTY ================================================================ -->
+  <div id="tab-faculty" class="hidden">
     <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Total Faculty</p>
@@ -189,31 +474,24 @@
       </div>
     </div>
 
-    <!-- Filters -->
     <div class="max-w-screen-xl mx-auto px-6 mt-4">
       <div class="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 items-center">
         <input id="facultySearchInput" type="text" placeholder="Search name, department, interests, lab assets..."
           class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-56 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
         <select id="facultyDeptFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
           <option value="">All Departments</option>
         </select>
-
         <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer whitespace-nowrap">
           <input id="facultyLabDataFilter" type="checkbox" class="accent-blue-600" />
           BD Profile Only
         </label>
-
         <button id="facultyClearBtn" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-2 underline">Clear filters</button>
       </div>
     </div>
 
-    <!-- Table -->
     <div class="max-w-screen-xl mx-auto px-6 mt-4 pb-10">
       <div class="bg-white rounded-xl shadow overflow-hidden">
-
         <div id="facultyAlertBar" class="hidden px-5 py-2.5 text-sm border-b"></div>
-
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-100 text-sm">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
@@ -231,22 +509,32 @@
             </tbody>
           </table>
         </div>
-
         <div class="px-5 py-3 border-t flex items-center justify-between bg-gray-50">
           <span id="facultyPageInfo" class="text-xs text-gray-500">—</span>
           <div class="flex gap-2">
-            <button id="facultyPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-              &larr; Prev
-            </button>
-            <button id="facultyNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
-              Next &rarr;
-            </button>
+            <button id="facultyPrevBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">&larr; Prev</button>
+            <button id="facultyNextBtn" class="px-3 py-1.5 border rounded-lg text-xs font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">Next &rarr;</button>
           </div>
         </div>
       </div>
     </div>
-
   </div><!-- /tab-faculty -->
+
+
+  <!-- ================================================================ MODAL ================================================================ -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center" style="display:none;">
+    <div id="modalBox" class="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4" style="max-height:90vh;overflow-y:auto;">
+      <div class="px-6 py-4 border-b flex items-center justify-between sticky top-0 bg-white rounded-t-xl z-10">
+        <h2 id="modalTitle" class="text-base font-semibold" style="color: #00274C;"></h2>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div id="modalBody" class="px-6 py-4"></div>
+      <div class="px-6 py-4 border-t flex gap-3 justify-end bg-gray-50 rounded-b-xl">
+        <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
+        <button id="modalSaveBtn" class="px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background-color: #00274C;">Save</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>

@@ -9,23 +9,31 @@ from api.routes.opportunities import router as opportunities_router
 from api.routes.sources import router as sources_router
 from api.routes.scrape import router as scrape_router
 from api.routes.faculty import router as faculty_router
+from api.routes.crm.organizations import router as orgs_router
+from api.routes.crm.contacts import router as contacts_router
+from api.routes.crm.activities import router as activities_router
+from api.routes.crm.tasks import router as tasks_router
+from api.routes.crm.pipeline import router as pipeline_router
 
 app = FastAPI(
-    title="LifeSci Opportunity Discovery",
-    description="Internal BD intelligence tool for discovering life sciences funding and collaboration opportunities.",
-    version="0.1.0",
+    title="FFMI Brain",
+    description="Internal BD intelligence and CRM platform for Michigan Medicine.",
+    version="2.0.0",
 )
 
-# Static files and templates
 _base = Path(__file__).parent.parent
 app.mount("/static", StaticFiles(directory=str(_base / "frontend" / "static")), name="static")
 templates = Jinja2Templates(directory=str(_base / "frontend" / "templates"))
 
-# API routes
 app.include_router(opportunities_router, prefix="/api")
 app.include_router(sources_router, prefix="/api")
 app.include_router(scrape_router, prefix="/api")
 app.include_router(faculty_router, prefix="/api")
+app.include_router(orgs_router, prefix="/api")
+app.include_router(contacts_router, prefix="/api")
+app.include_router(activities_router, prefix="/api")
+app.include_router(tasks_router, prefix="/api")
+app.include_router(pipeline_router, prefix="/api")
 
 
 @app.get("/", response_class=HTMLResponse)

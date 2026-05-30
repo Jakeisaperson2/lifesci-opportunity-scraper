@@ -21,7 +21,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    """FastAPI dependency — yields a DB session and closes it after the request."""
     db = SessionLocal()
     try:
         yield db
@@ -30,7 +29,6 @@ def get_db():
 
 
 def init_db():
-    """Create all tables if they don't exist. Safe to call on every startup."""
     Base.metadata.create_all(bind=engine)
 
 
@@ -38,7 +36,14 @@ def migrate_db():
     """Add any columns missing from existing tables. Safe to call repeatedly."""
     from sqlalchemy import text
     new_columns = {
-        "faculty_members": ["lab_assets TEXT", "project_ideas TEXT"],
+        "faculty_members": [
+            "lab_assets TEXT",
+            "project_ideas TEXT",
+        ],
+        "opportunities": [
+            "crm_status TEXT DEFAULT 'new'",
+            "organization_id INTEGER",
+        ],
     }
     with engine.connect() as conn:
         for table, col_defs in new_columns.items():
