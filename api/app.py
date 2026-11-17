@@ -16,8 +16,8 @@ from api.routes.crm.tasks import router as tasks_router
 from api.routes.crm.pipeline import router as pipeline_router
 
 app = FastAPI(
-    title="FFMI Brain",
-    description="Internal BD intelligence and CRM platform for Michigan Medicine.",
+    title="LifeSci Opportunity Scraper",
+    description="Business-development intelligence and CRM platform for academic medical centers.",
     version="2.0.0",
 )
 

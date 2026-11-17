@@ -1,8 +1,8 @@
-# CLAUDE.md — FFMI Brain
+# CLAUDE.md — LifeSci Opportunity Scraper
 
-Internal BD intelligence and CRM platform for Michigan Medicine. Automatically scrapes life
+BD intelligence and CRM platform for academic medical centers. Automatically scrapes life
 sciences websites for collaboration opportunities (RFPs, clinical trial partnerships,
-sponsored research, grants), maintains a Michigan Medicine faculty directory, and provides
+sponsored research, grants), maintains a faculty research directory (University of Michigan used as the example source), and provides
 a full CRM pipeline for tracking organizations, contacts, activities, and business development tasks.
 
 ---
@@ -72,7 +72,7 @@ lifesci-opportunity-scraper/
 │   └── faculty_runner.py       # run_faculty_scrape() + run_tableau_enrichment()
 │
 ├── frontend/
-│   ├── templates/index.html    # Tailwind dashboard — U-M branded (#00274C / #FFCB05)
+│   ├── templates/index.html    # Tailwind dashboard (navy #1E3A5F / sky #38BDF8)
 │   └── static/app.js           # Vanilla JS: 7-tab SPA with lazy loading + modal CRUD system
 │
 ├── utils/logger.py             # Loguru setup (console + rotating file)
@@ -204,7 +204,7 @@ One record per scraper execution (status: running/success/failed).
 
 Single-page app with **7 tabs**, all lazy-loaded on first visit. Shared modal system for CRUD.
 
-**Branding:** U-M Blue `#00274C` header, Maize `#FFCB05` accents.
+**Branding:** Navy `#1E3A5F` header, sky `#38BDF8` accents.
 
 **Tab: Opportunities**
 - Filters: text search, type, therapeutic area, CRM status, time window

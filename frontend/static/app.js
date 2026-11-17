@@ -1,4 +1,4 @@
-/* FFMI Brain — CRM + BD Intelligence Platform */
+/* LifeSci Opportunity Scraper — CRM + BD Intelligence Platform */
 
 // ---------------------------------------------------------------------------
 // Tab management
@@ -13,7 +13,7 @@ function showTab(name) {
     const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
     if (t === name) {
       btn.classList.add("bg-white");
-      btn.style.color = "#00274C";
+      btn.style.color = "#1E3A5F";
     } else {
       btn.classList.remove("bg-white");
       btn.style.color = "rgba(255,203,5,0.75)";
@@ -324,7 +324,7 @@ function renderPipelineStages(stages) {
   container.innerHTML = stages.map(s => {
     const isActive = pipelineFilterStatus === s.key;
     const border = isActive ? "border-2" : "border border-transparent";
-    const countColor = s.key === "awarded" ? "text-green-600" : s.key === "lost" ? "text-red-500" : "#00274C";
+    const countColor = s.key === "awarded" ? "text-green-600" : s.key === "lost" ? "text-red-500" : "#1E3A5F";
     return `
       <div onclick="filterPipelineByStage('${escHtml(s.key)}')"
         class="bg-white rounded-xl shadow p-3 cursor-pointer hover:shadow-md transition-shadow ${border} ${isActive ? 'border-blue-500' : ''}">
@@ -977,7 +977,7 @@ function showFacultyAlert(msg, type = "info") {
 async function triggerFacultyRefresh() {
   const btn = document.getElementById("facultyRefreshBtn");
   btn.disabled = true; btn.textContent = "Running...";
-  showFacultyAlert("Refreshing faculty — pulling NIH Reporter data then enriching from U-M Tableau dashboard. ~15 seconds.", "info");
+  showFacultyAlert("Refreshing faculty — pulling NIH Reporter data then enriching from the faculty Tableau dashboard. ~15 seconds.", "info");
   try {
     await apiFetch("/api/faculty/refresh", { method: "POST" });
     await sleep(18000);

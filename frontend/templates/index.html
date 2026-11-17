@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FFMI Brain</title>
+  <title>LifeSci Opportunity Scraper</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .badge { @apply inline-block px-2 py-0.5 rounded text-xs font-medium; }
     .truncate-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    :root { --um-blue: #00274C; --um-maize: #FFCB05; }
+    :root { --brand-primary: #1E3A5F; --brand-accent: #38BDF8; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
 
   <!-- Header -->
-  <header class="text-white shadow-md" style="background-color: #00274C;">
+  <header class="text-white shadow-md" style="background-color: #1E3A5F;">
     <div class="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
       <div>
         <h1 class="text-xl font-bold tracking-tight">
-          FFMI Brain
-          <span class="ml-2 text-xs font-normal px-2 py-0.5 rounded" style="background-color: #FFCB05; color: #00274C;">Michigan Medicine</span>
+          LifeSci Opportunity Scraper
+          <span class="ml-2 text-xs font-normal px-2 py-0.5 rounded" style="background-color: #38BDF8; color: #1E3A5F;">Beta</span>
         </h1>
-        <p class="text-xs mt-0.5" style="color: #FFCB05; opacity: 0.85;">Michigan Medicine Business Development Intelligence</p>
+        <p class="text-xs mt-0.5" style="color: #38BDF8; opacity: 0.85;">Business Development Intelligence for Academic Medical Centers</p>
       </div>
       <div class="flex items-center gap-3">
-        <span id="scrapeStatus" class="text-xs hidden" style="color: #FFCB05;"></span>
+        <span id="scrapeStatus" class="text-xs hidden" style="color: #38BDF8;"></span>
         <button id="scrapeBtn"
           class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
-          style="background-color: #FFCB05; color: #00274C;"
+          style="background-color: #38BDF8; color: #1E3A5F;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           Run Scrape
         </button>
@@ -38,7 +38,7 @@
     <div class="max-w-screen-xl mx-auto px-6 flex gap-1 pb-0 overflow-x-auto">
       <button id="tabBtnOpportunities" onclick="showTab('opportunities')"
         class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition bg-white whitespace-nowrap"
-        style="color: #00274C;">Opportunities</button>
+        style="color: #1E3A5F;">Opportunities</button>
       <button id="tabBtnPipeline" onclick="showTab('pipeline')"
         class="tab-btn px-4 py-2 text-sm font-semibold rounded-t-lg transition whitespace-nowrap"
         style="color: rgba(255,203,5,0.75);">Pipeline</button>
@@ -66,15 +66,15 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Total Opportunities</p>
-        <p id="statTotal" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
+        <p id="statTotal" class="text-3xl font-bold mt-1" style="color: #1E3A5F;">—</p>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">New This Week</p>
-        <p id="statWeek" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
+        <p id="statWeek" class="text-3xl font-bold mt-1" style="color: #1E3A5F;">—</p>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Showing</p>
-        <p id="statShowing" class="text-3xl font-bold mt-1" style="color: #FFCB05;">—</p>
+        <p id="statShowing" class="text-3xl font-bold mt-1" style="color: #38BDF8;">—</p>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Last Run</p>
@@ -170,7 +170,7 @@
   <div id="tab-pipeline" class="hidden">
     <div class="max-w-screen-xl mx-auto px-6 mt-5">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold" style="color: #00274C;">BD Pipeline</h2>
+        <h2 class="text-lg font-bold" style="color: #1E3A5F;">BD Pipeline</h2>
         <p class="text-xs text-gray-400">Click a stage to filter the table below</p>
       </div>
 
@@ -182,7 +182,7 @@
       <!-- Filtered opportunities table for selected stage -->
       <div class="bg-white rounded-xl shadow overflow-hidden">
         <div class="px-5 py-3 border-b flex items-center justify-between">
-          <span id="pipelineTableTitle" class="text-sm font-semibold" style="color: #00274C;">All Active Opportunities</span>
+          <span id="pipelineTableTitle" class="text-sm font-semibold" style="color: #1E3A5F;">All Active Opportunities</span>
           <button id="pipelineClearFilter" class="text-xs text-gray-400 hover:text-gray-600 underline hidden">Clear stage filter</button>
         </div>
         <div class="overflow-x-auto">
@@ -219,11 +219,11 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-bold" style="color: #00274C;">Organizations</h2>
+          <h2 class="text-lg font-bold" style="color: #1E3A5F;">Organizations</h2>
           <p id="orgStatTotal" class="text-xs text-gray-400 mt-0.5">— organizations</p>
         </div>
         <button onclick="openOrgModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
-          style="background-color: #00274C; color: white;"
+          style="background-color: #1E3A5F; color: white;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           + New Organization
         </button>
@@ -279,11 +279,11 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-bold" style="color: #00274C;">Contacts</h2>
+          <h2 class="text-lg font-bold" style="color: #1E3A5F;">Contacts</h2>
           <p id="contactStatTotal" class="text-xs text-gray-400 mt-0.5">— contacts</p>
         </div>
         <button onclick="openContactModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
-          style="background-color: #00274C; color: white;"
+          style="background-color: #1E3A5F; color: white;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           + New Contact
         </button>
@@ -331,11 +331,11 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-bold" style="color: #00274C;">Activity Log</h2>
+          <h2 class="text-lg font-bold" style="color: #1E3A5F;">Activity Log</h2>
           <p id="activityStatTotal" class="text-xs text-gray-400 mt-0.5">— activities</p>
         </div>
         <button onclick="openActivityModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
-          style="background-color: #00274C; color: white;"
+          style="background-color: #1E3A5F; color: white;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           + Log Activity
         </button>
@@ -391,11 +391,11 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-bold" style="color: #00274C;">Tasks</h2>
+          <h2 class="text-lg font-bold" style="color: #1E3A5F;">Tasks</h2>
           <p id="taskStatTotal" class="text-xs text-gray-400 mt-0.5">— tasks</p>
         </div>
         <button onclick="openTaskModal()" class="text-sm font-semibold px-4 py-2 rounded-lg shadow transition"
-          style="background-color: #00274C; color: white;"
+          style="background-color: #1E3A5F; color: white;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           + New Task
         </button>
@@ -454,20 +454,20 @@
     <div class="max-w-screen-xl mx-auto px-6 mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Total Faculty</p>
-        <p id="facultyStatTotal" class="text-3xl font-bold mt-1" style="color: #00274C;">—</p>
+        <p id="facultyStatTotal" class="text-3xl font-bold mt-1" style="color: #1E3A5F;">—</p>
       </div>
       <div class="bg-white rounded-xl shadow p-4">
         <p class="text-xs text-gray-400 uppercase tracking-wide">Showing</p>
-        <p id="facultyStatShowing" class="text-3xl font-bold mt-1" style="color: #FFCB05;">—</p>
+        <p id="facultyStatShowing" class="text-3xl font-bold mt-1" style="color: #38BDF8;">—</p>
       </div>
       <div class="bg-white rounded-xl shadow p-4 flex items-center justify-between">
         <div>
-          <p class="text-xs text-gray-400 uppercase tracking-wide">Michigan Medicine</p>
-          <p class="text-sm font-semibold text-gray-600 mt-1">researchers.umich.edu</p>
+          <p class="text-xs text-gray-400 uppercase tracking-wide">Example data source</p>
+          <p class="text-sm font-semibold text-gray-600 mt-1">NIH RePORTER + U-M</p>
         </div>
         <button id="facultyRefreshBtn"
           class="text-xs font-semibold px-3 py-2 rounded-lg shadow transition"
-          style="background-color: #FFCB05; color: #00274C;"
+          style="background-color: #38BDF8; color: #1E3A5F;"
           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
           Refresh Faculty
         </button>
@@ -505,7 +505,7 @@
               </tr>
             </thead>
             <tbody id="facultyTableBody" class="divide-y divide-gray-50">
-              <tr><td colspan="6" class="px-4 py-12 text-center text-gray-400">Click "Refresh Faculty" to load the Michigan Medicine directory.</td></tr>
+              <tr><td colspan="6" class="px-4 py-12 text-center text-gray-400">Click "Refresh Faculty" to load the faculty directory.</td></tr>
             </tbody>
           </table>
         </div>
@@ -525,13 +525,13 @@
   <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center" style="display:none;">
     <div id="modalBox" class="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4" style="max-height:90vh;overflow-y:auto;">
       <div class="px-6 py-4 border-b flex items-center justify-between sticky top-0 bg-white rounded-t-xl z-10">
-        <h2 id="modalTitle" class="text-base font-semibold" style="color: #00274C;"></h2>
+        <h2 id="modalTitle" class="text-base font-semibold" style="color: #1E3A5F;"></h2>
         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
       </div>
       <div id="modalBody" class="px-6 py-4"></div>
       <div class="px-6 py-4 border-t flex gap-3 justify-end bg-gray-50 rounded-b-xl">
         <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">Cancel</button>
-        <button id="modalSaveBtn" class="px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background-color: #00274C;">Save</button>
+        <button id="modalSaveBtn" class="px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background-color: #1E3A5F;">Save</button>
       </div>
     </div>
   </div>
