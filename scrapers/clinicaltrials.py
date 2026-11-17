@@ -31,8 +31,12 @@ class ClinicalTrialsScraper(BaseScraper):
         "PointOfContactEMail",
         "CentralContactEMail",
         "StudyType",
-        "FunderType",
     ])
+
+    # The v2 API has no filter.studyType parameter, and aggFilters=funderType is
+    # silently ignored, so both constraints go through Essie's filter.advanced syntax.
+    INTERVENTIONAL = "AREA[StudyType]INTERVENTIONAL"
+    INDUSTRY_INTERVENTIONAL = f"{INTERVENTIONAL} AND AREA[LeadSponsorClass]INDUSTRY"
 
     # Life-sciences search terms that indicate opportunities for academic sites
     SEARCH_TERMS = [
@@ -65,8 +69,7 @@ class ClinicalTrialsScraper(BaseScraper):
     def _fetch_industry_sponsored(self, seen_ids: set) -> list[OpportunityData]:
         params = {
             "filter.overallStatus": "RECRUITING,NOT_YET_RECRUITING",
-            "filter.studyType": "INTERVENTIONAL",
-            "aggFilters": "funderType:INDUSTRY",
+            "filter.advanced": self.INDUSTRY_INTERVENTIONAL,
             "pageSize": 50,
             "fields": self.FIELDS,
             "sort": "LastUpdatePostDate:desc",
@@ -77,7 +80,7 @@ class ClinicalTrialsScraper(BaseScraper):
         params = {
             "query.term": term,
             "filter.overallStatus": "RECRUITING,NOT_YET_RECRUITING",
-            "filter.studyType": "INTERVENTIONAL",
+            "filter.advanced": self.INTERVENTIONAL,
             "pageSize": 25,
             "fields": self.FIELDS,
         }
@@ -98,10 +101,10 @@ class ClinicalTrialsScraper(BaseScraper):
             seen_ids.add(nct_id)
 
             desc_module = proto.get("descriptionModule", {})
-            status_module = proto.get("statusModule", {})
             sponsor_module = proto.get("sponsorCollaboratorsModule", {})
             conditions_module = proto.get("conditionsModule", {})
             contacts_module = proto.get("contactsLocationsModule", {})
+            design_module = proto.get("designModule", {})
 
             lead_sponsor = sponsor_module.get("leadSponsor", {})
             company = lead_sponsor.get("name", "")
@@ -116,7 +119,9 @@ class ClinicalTrialsScraper(BaseScraper):
             conditions = conditions_module.get("conditions", [])
             therapeutic_area = ", ".join(conditions[:3]) if conditions else ""
 
-            phase = status_module.get("phase", "")
+            # Phases live in designModule as a list, e.g. ["PHASE1", "PHASE2"]; "NA" = not applicable
+            phases = [p for p in design_module.get("phases", []) if p != "NA"]
+            phase = "/".join(phases)
             title = id_module.get("briefTitle", "")
             if phase:
                 title = f"[{phase}] {title}"

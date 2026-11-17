@@ -58,7 +58,7 @@ lifesci-opportunity-scraper/
 │   ├── registry.py             # Maps scraper_key → class
 │   ├── clinicaltrials.py       # ClinicalTrials.gov REST API v2
 │   ├── grants_gov.py           # Grants.gov REST API (POST-based search)
-│   ├── nih_guide.py            # NIH Guide RSS feed
+│   ├── nih_guide.py            # NIH Guide search API (RSS fallback)
 │   ├── sbir_gov.py             # SBIR.gov solicitations REST API
 │   ├── wellcome.py             # Wellcome Trust (HTML + Next.js data extraction)
 │   ├── rwjf.py                 # Robert Wood Johnson Foundation (HTML)
@@ -169,7 +169,7 @@ One record per scraper execution (status: running/success/failed).
 |---------|-----|--------|--------|
 | `ClinicalTrialsScraper` | `clinicaltrials` | clinicaltrials.gov/api/v2 | REST API |
 | `GrantsGovScraper` | `grants_gov` | apply07.grants.gov | POST REST API |
-| `NIHGuideScraper` | `nih_guide` | grants.nih.gov/feeds/Guide.rss | RSS/XML |
+| `NIHGuideScraper` | `nih_guide` | search.grants.nih.gov/guide/api/data (fallback: grants.nih.gov/grants/guide/newsfeed/fundingopps.xml) | JSON API + RSS fallback |
 | `SBIRGovScraper` | `sbir_gov` | api.sbir.gov/public/api/solicitations | REST API |
 | `WellcomeTrustScraper` | `wellcome` | wellcome.org/grant-funding | HTML/Next.js |
 | `RWJFScraper` | `rwjf` | rwjf.org/grants/funding-opportunities | HTML |
@@ -315,8 +315,8 @@ Get-Process python | Stop-Process -Force
 - [ ] **Reporting tab** — opportunities by status, by sponsor, by funding amount; conversion funnel; active negotiations
 
 ### Scraper improvements
-- [ ] Fix ClinicalTrials.gov scraper (currently 400 — API v2 field list format changed)
-- [ ] Fix NIH Guide RSS scraper (currently 404 — URL moved)
+- [x] Fixed ClinicalTrials.gov scraper (2026-11-17): removed invalid `FunderType` field and `filter.studyType` param; industry/interventional filters now use `filter.advanced` (AREA[...] syntax); phase read from `designModule.phases`
+- [x] Fixed NIH Guide scraper (2026-11-17): old RSS URL 404s. Now uses the (undocumented) NIH Guide search API for all ~376 active NOFOs with expiration dates; NOFOs without a Guide HTML page link to Grants.gov (same URL format as grants_gov scraper, so dedup merges them). Weekly RSS kept as fallback; doc type read from doc number, not title
 - [ ] Playwright support for JS-rendered pages (pharma partner portals)
 - [ ] Scheduled auto-scraping via APScheduler
 

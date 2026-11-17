@@ -21,7 +21,7 @@ sources:
     scrape_interval_hours: 24
 
   - name: NIH Guide for Grants and Contracts
-    url: https://grants.nih.gov/feeds/Guide.rss
+    url: https://grants.nih.gov/funding/searchguide/
     scraper_key: nih_guide
     enabled: true
     scrape_interval_hours: 24

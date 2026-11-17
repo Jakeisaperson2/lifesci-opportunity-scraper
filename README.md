@@ -94,7 +94,6 @@ lifesci-opportunity-scraper/
 
 ## Roadmap
 
-- [ ] Update ClinicalTrials.gov and NIH Guide scrapers for recent upstream API/URL changes
 - [ ] AI summarization and opportunity-to-faculty matching with an LLM
 - [ ] Scheduled auto-scraping (APScheduler)
 - [ ] Email/Slack alerts for saved searches
