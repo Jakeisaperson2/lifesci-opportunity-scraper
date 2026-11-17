@@ -332,5 +332,5 @@ Get-Process python | Stop-Process -Force
 
 ## GitHub
 
-Repo: https://github.com/Jakeisaperson2/lifesci-opportunity-scraper (private)
+Repo: https://github.com/Jakeisaperson2/lifesci-opportunity-scraper (public)
 Branch: `master`
